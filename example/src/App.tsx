@@ -1,25 +1,21 @@
 import * as React from 'react';
 
 import { StyleSheet, View } from 'react-native';
-import { WheelPickerPurejsView } from 'react-native-wheel-picker-purejs';
+import WheelPicker from '../../src/wheelPicker';
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <WheelPickerPurejsView color="#32a852" style={styles.box} />
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+            <WheelPicker wheelWidth={100} itemHeight={60} data={[1, 2, 3]} />
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
+    container: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+    },
 });
