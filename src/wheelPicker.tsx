@@ -14,6 +14,7 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
     const _visibleNum = props.visibleNum ?? 2;
 
     const listRef = useRef<FlatList<string> | null>(null);
+    const momentumBeginRef = useRef<boolean>(false);
     const visibleNum = _visibleNum <= 3 ? _visibleNum : 3;
     const listHeight = (visibleNum * 2 + 1) * props.itemHeight;
 
@@ -32,19 +33,25 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
             contentOffset: { x: number; y: number };
         };
     }) => {
+        console.log('end drag');
         const y = event.nativeEvent.contentOffset.y;
         if (y < 0 || y > maxOffsetY) {
             console.log('out range');
             return;
         }
 
-        const idx = Math.round(y / props.itemHeight);
-        listRef.current?.scrollToIndex({
-            animated: true,
-            index: idx,
-        });
+        // the timing of momentunBegin even is latter than scrollEndDrag even, so delay the drag event
+        setTimeout(() => {
+            if (momentumBeginRef.current) {
+                return;
+            }
 
-        console.log(`ff ${event.nativeEvent.contentOffset.y}`);
+            const idx = Math.round(y / props.itemHeight);
+            listRef.current?.scrollToIndex({
+                animated: true,
+                index: idx,
+            });
+        }, 100);
     };
 
     const momentumScrollEnd = (event: {
@@ -52,10 +59,28 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
             contentOffset: { x: number; y: number };
         };
     }) => {
+        if (!momentumBeginRef.current) {
+            return;
+        }
+
+        momentumBeginRef.current = false;
+        console.log('momentumScrollEnd');
         const y = event.nativeEvent.contentOffset.y;
+        if (y < 0 || y > maxOffsetY) {
+            console.log('out range');
+            return;
+        }
         const idx = Math.round(y / props.itemHeight);
-        props.onChange && props.onChange(idx);
+        listRef.current?.scrollToIndex({
+            animated: true,
+            index: idx,
+        });
+        setTimeout(() => {
+            props.onChange && props.onChange(idx);
+        }, 200);
     };
+
+    console.log('render');
 
     return (
         <View style={[styles.container, { width: props.wheelWidth }]}>
@@ -78,6 +103,10 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
                 scrollEventThrottle={1}
                 onScrollEndDrag={scrollEndDrag}
                 onMomentumScrollEnd={momentumScrollEnd}
+                onMomentumScrollBegin={() => {
+                    console.log('momentumScrollBegin');
+                    momentumBeginRef.current = true;
+                }}
                 onScrollToIndexFailed={() => {}}
                 renderItem={({ item }) => {
                     return (
