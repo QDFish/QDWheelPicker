@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, TouchableWithoutFeedback, Text } from 'react-native';
 import WheelPicker from '../../src/wheelPicker';
 
 export default function App() {
@@ -8,6 +8,15 @@ export default function App() {
 
     return (
         <View style={styles.container}>
+            <TouchableWithoutFeedback
+                onPress={() => {
+                    setSelectIndex((i) => (i + 1) % 12);
+                }}
+            >
+                <View style={styles.button}>
+                    <Text style={styles.buttonText}>{'+'}</Text>
+                </View>
+            </TouchableWithoutFeedback>
             <WheelPicker
                 wheelWidth={100}
                 itemHeight={60}
@@ -41,5 +50,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 12,
+    },
+
+    button: {
+        backgroundColor: 'green',
+        width: 100,
+        height: 30,
+    },
+
+    buttonText: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'normal',
     },
 });

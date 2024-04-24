@@ -51,6 +51,9 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
                 animated: true,
                 index: idx,
             });
+            setTimeout(() => {
+                props.onChange && props.onChange(idx);
+            }, 200);
         }, 100);
     };
 
