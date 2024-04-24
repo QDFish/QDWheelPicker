@@ -6,6 +6,8 @@ interface WheelPickerProps {
     itemHeight: number;
     data: string[];
     visibleNum?: 1 | 2 | 3;
+    selectIndex: number;
+    onChange?: (index: number) => void;
 }
 
 const WheelPicker: React.FC<WheelPickerProps> = (props) => {
@@ -45,6 +47,16 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
         console.log(`ff ${event.nativeEvent.contentOffset.y}`);
     };
 
+    const momentumScrollEnd = (event: {
+        nativeEvent: {
+            contentOffset: { x: number; y: number };
+        };
+    }) => {
+        const y = event.nativeEvent.contentOffset.y;
+        const idx = Math.round(y / props.itemHeight);
+        props.onChange && props.onChange(idx);
+    };
+
     return (
         <View style={[styles.container, { width: props.wheelWidth }]}>
             <View
@@ -55,12 +67,18 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
             />
             <FlatList
                 ref={listRef}
+                contentOffset={{
+                    x: 0,
+                    y: props.selectIndex * props.itemHeight,
+                }}
                 overScrollMode="always"
                 showsVerticalScrollIndicator={false}
                 style={[styles.list, { maxHeight: listHeight }]}
                 data={data}
                 scrollEventThrottle={1}
                 onScrollEndDrag={scrollEndDrag}
+                onMomentumScrollEnd={momentumScrollEnd}
+                onScrollToIndexFailed={() => {}}
                 renderItem={({ item }) => {
                     return (
                         <View
