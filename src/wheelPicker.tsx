@@ -41,7 +41,7 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
             return;
         }
 
-        // the timing of momentunBegin even is latter than scrollEndDrag even, so delay the drag event
+        // the timing of momentunBegin even is later than scrollEndDrag even, thus delaying the drag event
         setTimeout(() => {
             if (momentumBeginRef.current) {
                 return;
