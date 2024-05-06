@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import { FlatList, StyleSheet, View, Text } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
+import WheelPickerRow from './WheelPickerRow';
 
 interface WheelPickerProps {
     wheelWidth: number;
@@ -113,11 +114,10 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
                 onScrollToIndexFailed={() => {}}
                 renderItem={({ item }) => {
                     return (
-                        <View
-                            style={[styles.row, { height: props.itemHeight }]}
-                        >
-                            <Text style={styles.rowTitle}>{item}</Text>
-                        </View>
+                        <WheelPickerRow
+                            itemHeight={props.itemHeight}
+                            text={item}
+                        />
                     );
                 }}
             />
@@ -139,17 +139,6 @@ const styles = StyleSheet.create({
     list: {
         // backgroundColor: 'gray',
         backgroundColor: 'transparent',
-    },
-    row: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        // backgroundColor: '#EEEEEE',
-        // borderWidth: 1
-    },
-    rowTitle: {
-        color: 'black',
-        fontSize: 12,
-        fontWeight: 'normal',
     },
 });
 
