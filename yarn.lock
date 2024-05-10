@@ -10877,6 +10877,7 @@ __metadata:
     react: 18.2.0
     react-native: 0.73.6
     react-native-builder-bob: ^0.20.0
+    react-native-wheely: ^0.6.0
     release-it: ^15.0.0
     turbo: ^1.10.7
     typescript: ^5.2.2
@@ -10885,6 +10886,13 @@ __metadata:
     react-native: "*"
   languageName: unknown
   linkType: soft
+
+"react-native-wheely@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "react-native-wheely@npm:0.6.0"
+  checksum: 3223c0056160f02696e0d980198b6b3ada6b401c7fba17882253e5700c4066c5c2b9834213317e6c190a1e991acfec7c5526ee08ca89d5eed133c247386cd180
+  languageName: node
+  linkType: hard
 
 "react-native@npm:0.73.6":
   version: 0.73.6
