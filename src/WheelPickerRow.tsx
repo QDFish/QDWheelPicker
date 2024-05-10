@@ -66,17 +66,10 @@ const WheelPickerRow: React.FC<WheelPickerRowProps> = (props) => {
         outputRange: (() => {
             const range: number[] = [0];
             for (let i = 1; i <= visibleNum; i++) {
-                let y =
-                    (itemHeight / 2) *
-                    (1 - Math.sin(Math.PI / 2 - rotateFunc(i) * radEach));
+                let y = (itemHeight / 2) * (1 - Math.sin(Math.PI / 2 - rotateFunc(i) * radEach)); // prettier-ignore
+
                 for (let j = 1; j < i; j++) {
-                    y =
-                        y +
-                        itemHeight *
-                            (1 -
-                                Math.sin(
-                                    Math.PI / 2 - rotateFunc(j) * radEach
-                                ));
+                    y = y + itemHeight * (1 - Math.sin(Math.PI / 2 - rotateFunc(j) * radEach)); // prettier-ignore
                 }
                 range.unshift(-y);
                 range.push(y);
