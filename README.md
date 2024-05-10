@@ -1,31 +1,44 @@
 # react-native-wheel-picker-purejs
 
-this is a project using pure js code
+## this is wheel picker with pure ts code
 
-## Installation
+![pure_wheel_picker.gif](pure_wheel_picker.gif)
 
-```sh
-npm install react-native-wheel-picker-purejs
+# Usage
+
+```tsx
+export default function App() {
+    const [selectIndex, setSelectIndex] = React.useState<number>(0);
+
+    return (
+        <View>
+            <WheelPicker
+                visibleNum={2}
+                textStyle={{ fontSize: 30 }}
+                wheelWidth={100}
+                itemHeight={40}
+                data={[
+                    '1',
+                    '2',
+                    '3',
+                    '4',
+                    '5',
+                    '6',
+                    '7',
+                    '8',
+                    '9',
+                    '10',
+                    '11',
+                    '12',
+                ]}
+                selectIndex={selectIndex}
+                onChange={(idx) => {
+                    setSelectIndex(idx);
+                    console.log(`idx ${idx}`);
+                }}
+            />
+        </View>
+    );
+}
 ```
 
-## Usage
-
-```js
-import { WheelPickerPurejsView } from "react-native-wheel-picker-purejs";
-
-// ...
-
-<WheelPickerPurejsView color="tomato" />
-```
-
-## Contributing
-
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
-
-## License
-
-MIT
-
----
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)
