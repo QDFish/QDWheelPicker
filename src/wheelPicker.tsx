@@ -3,11 +3,12 @@ import {
     FlatList,
     StyleSheet,
     View,
+    Text,
     type ViewStyle,
     type TextStyle,
-    Animated,
 } from 'react-native';
-import WheelPickerRow from './WheelPickerRow';
+import 'react-native-gesture-handler';
+import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated';
 
 interface WheelPickerProps {
     wheelWidth: number;
@@ -27,7 +28,6 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
     const momentumBeginRef = useRef<boolean>(false);
     const visibleNum = _visibleNum <= 3 ? _visibleNum : 3;
     const listHeight = (visibleNum * 2 + 1) * props.itemHeight;
-    const scrollY = useRef(new Animated.Value(0)).current;
 
     let data = props.data.slice();
     let i = visibleNum;
@@ -67,6 +67,10 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
             }, 200);
         }, 100);
     };
+
+    const scrollHandler = useAnimatedScrollHandler((event) => {
+        console.log(event.contentOffset.y);
+    });
 
     const momentumScrollEnd = (event: {
         nativeEvent: {
@@ -122,29 +126,21 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
                     momentumBeginRef.current = true;
                 }}
                 onScrollToIndexFailed={() => {}}
-                onScroll={Animated.event(
-                    [
-                        {
-                            nativeEvent: {
-                                contentOffset: {
-                                    y: scrollY,
-                                },
-                            },
-                        },
-                    ],
-                    { useNativeDriver: true }
-                )}
-                renderItem={({ item, index }) => {
+                onScroll={scrollHandler}
+                renderItem={({ item }) => {
                     return (
-                        <WheelPickerRow
-                            rowStyle={props.rowStyle}
-                            textStyle={props.textStyle}
-                            itemHeight={props.itemHeight}
-                            text={item}
-                            scrollY={scrollY}
-                            idx={index}
-                            visibleNum={visibleNum}
-                        />
+                        <View style={{ height: 30 }}>
+                            <Text>{item}</Text>
+                        </View>
+                        // <WheelPickerRow
+                        //     rowStyle={props.rowStyle}
+                        //     textStyle={props.textStyle}
+                        //     itemHeight={props.itemHeight}
+                        //     text={item}
+                        //     scrollY={scrollY}
+                        //     idx={index}
+                        //     visibleNum={visibleNum}
+                        // />
                     );
                 }}
             />

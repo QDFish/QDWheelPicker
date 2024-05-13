@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text, TouchableHighlight } from 'react-native';
-import WheelPicker from '../../src/wheelPicker';
+import WheelPicker from '../../src/WheelPicker';
 
 export default function App() {
     const [selectIndex, setSelectIndex] = React.useState<number>(0);

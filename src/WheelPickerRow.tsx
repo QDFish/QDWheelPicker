@@ -25,9 +25,13 @@ const WheelPickerRow: React.FC<WheelPickerRowProps> = (props) => {
     const radEach = (degEach / 180) * 3.14;
     const _idx = (props.idx - props.visibleNum) * step;
 
+    props.scrollY.addListener((state: { value: number }) => {
+        console.log(`qdfish ${state.value}`);
+    });
+
     const rotateFunc = (idx: number) => {
         const i = (1 / visibleNum) * idx;
-        return -Math.pow(1 / 4, i) + 1;
+        return i;
     };
 
     const rotateX = props.scrollY.interpolate({
@@ -52,61 +56,75 @@ const WheelPickerRow: React.FC<WheelPickerRowProps> = (props) => {
         })(),
     });
 
+    const inputRange = (() => {
+        const initScrollY = _idx * itemHeight;
+        const range: number[] = [initScrollY];
+        const i = visibleNum;
+        range.unshift(initScrollY - itemHeight * i);
+        range.push(initScrollY + itemHeight * i);
+
+        return range;
+    })();
+
+    const outputRange = (() => {
+        const range: number[] = [0];
+        const i = visibleNum;
+        let y = (itemHeight / 2) * (1 - Math.sin(Math.PI / 2 - rotateFunc(i) * radEach)); // prettier-ignore
+        for (let j = 1; j < i; j++) {
+            y = y + itemHeight * (1 - Math.sin(Math.PI / 2 - rotateFunc(j) * radEach)); // prettier-ignore
+        }
+        range.unshift(-y);
+        range.push(y);
+
+        return range;
+    })();
+
     const translateY = props.scrollY.interpolate({
-        inputRange: (() => {
-            const initScrollY = _idx * itemHeight;
-            const range: number[] = [initScrollY];
-            for (let i = 1; i <= visibleNum; i++) {
-                range.unshift(initScrollY - itemHeight * i);
-                range.push(initScrollY + itemHeight * i);
-            }
-
-            return range;
-        })(),
-        outputRange: (() => {
-            const range: number[] = [0];
-            for (let i = 1; i <= visibleNum; i++) {
-                let y = (itemHeight / 2) * (1 - Math.sin(Math.PI / 2 - rotateFunc(i) * radEach)); // prettier-ignore
-
-                for (let j = 1; j < i; j++) {
-                    y = y + itemHeight * (1 - Math.sin(Math.PI / 2 - rotateFunc(j) * radEach)); // prettier-ignore
-                }
-                range.unshift(-y);
-                range.push(y);
-            }
-            return range;
-        })(),
+        inputRange: inputRange,
+        outputRange: outputRange,
         extrapolate: 'clamp',
-    });
-
-    const opacity = props.scrollY.interpolate({
-        inputRange: (() => {
-            const initScrollY = _idx * itemHeight;
-            const range: number[] = [initScrollY];
-            for (let i = 1; i <= visibleNum; i++) {
-                range.unshift(initScrollY - itemHeight * i);
-                range.push(initScrollY + itemHeight * i);
+        easing: (t) => {
+            if (_idx == 0) {
+                console.log(t);
             }
 
-            return range;
-        })(),
-        outputRange: (() => {
-            const range = [1];
-            for (let x = 1; x <= visibleNum; x++) {
-                const y = Math.pow(1 / 2, x);
-                range.unshift(y);
-                range.push(y);
-            }
-            return range;
-        })(),
+            return t;
+        },
     });
+
+    // const opacity = props.scrollY.interpolate({
+    //     inputRange: (() => {
+    //         const initScrollY = _idx * itemHeight;
+    //         const range: number[] = [initScrollY];
+    //         for (let i = 1; i <= visibleNum; i++) {
+    //             range.unshift(initScrollY - itemHeight * i);
+    //             range.push(initScrollY + itemHeight * i);
+    //         }
+
+    //         return range;
+    //     })(),
+    //     outputRange: (() => {
+    //         const range = [1];
+    //         for (let x = 1; x <= visibleNum; x++) {
+    //             const y = Math.pow(1 / 2, x);
+    //             range.unshift(y);
+    //             range.push(y);
+    //         }
+    //         return range;
+    //     })(),
+    // });
+
+    if (_idx == 0) {
+        console.log(inputRange);
+        console.log(outputRange);
+    }
 
     return (
         <Animated.View
             style={[
                 styles.row,
                 props.rowStyle,
-                { opacity, height: props.itemHeight, width: 'auto' },
+                { height: props.itemHeight, width: 'auto' },
                 { transform: [{ rotateX }, { translateY }] },
             ]}
         >

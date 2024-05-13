@@ -158,6 +158,8 @@
     ]
   },
   "dependencies": {
+    "react-native-gesture-handler": "^2.16.2",
+    "react-native-reanimated": "^3.11.0",
     "react-native-wheely": "^0.6.0"
   }
 }
