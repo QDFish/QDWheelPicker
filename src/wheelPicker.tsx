@@ -3,12 +3,13 @@ import {
     FlatList,
     StyleSheet,
     View,
-    Text,
+    TouchableWithoutFeedback,
     type ViewStyle,
     type TextStyle,
 } from 'react-native';
-import 'react-native-gesture-handler';
+import { type ReanimatedScrollEvent } from 'react-native-reanimated/lib/typescript/reanimated2/hook/commonTypes';
 import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated';
+import WheelPickerRow, { type WheelPickerRowRefType } from './WheelPickerRow';
 
 interface WheelPickerProps {
     wheelWidth: number;
@@ -21,9 +22,11 @@ interface WheelPickerProps {
     textStyle?: TextStyle;
 }
 
-const WheelPicker: React.FC<WheelPickerProps> = (props) => {
-    const _visibleNum = props.visibleNum ?? 2;
+// const AnimatedWheelPickerRow = Animated.createAnimatedComponent(WheelPickerRow)
 
+const WheelPicker: React.FC<WheelPickerProps> = (props) => {
+    const ref = useRef<WheelPickerRowRefType | null>(null);
+    const _visibleNum = props.visibleNum ?? 2;
     const listRef = useRef<FlatList<string> | null>(null);
     const momentumBeginRef = useRef<boolean>(false);
     const visibleNum = _visibleNum <= 3 ? _visibleNum : 3;
@@ -68,9 +71,12 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
         }, 100);
     };
 
-    const scrollHandler = useAnimatedScrollHandler((event) => {
-        console.log(event.contentOffset.y);
-    });
+    const scrollHandler = useAnimatedScrollHandler(
+        (event: ReanimatedScrollEvent) => {
+            'worklet';
+            console.log(event.contentOffset.y);
+        }
+    );
 
     const momentumScrollEnd = (event: {
         nativeEvent: {
@@ -127,20 +133,24 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
                 }}
                 onScrollToIndexFailed={() => {}}
                 onScroll={scrollHandler}
-                renderItem={({ item }) => {
+                renderItem={({ item, index }) => {
                     return (
-                        <View style={{ height: 30 }}>
-                            <Text>{item}</Text>
-                        </View>
-                        // <WheelPickerRow
-                        //     rowStyle={props.rowStyle}
-                        //     textStyle={props.textStyle}
-                        //     itemHeight={props.itemHeight}
-                        //     text={item}
-                        //     scrollY={scrollY}
-                        //     idx={index}
-                        //     visibleNum={visibleNum}
-                        // />
+                        <TouchableWithoutFeedback
+                            onPress={() => {
+                                console.log('ddd');
+                                ref.current?.hh(2);
+                            }}
+                        >
+                            <WheelPickerRow
+                                ref={ref}
+                                rowStyle={props.rowStyle}
+                                textStyle={props.textStyle}
+                                itemHeight={props.itemHeight}
+                                text={item}
+                                idx={index}
+                                visibleNum={visibleNum}
+                            />
+                        </TouchableWithoutFeedback>
                     );
                 }}
             />
