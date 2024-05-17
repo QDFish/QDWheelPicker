@@ -1,13 +1,12 @@
-import React, { useImperativeHandle } from 'react';
+import React from 'react';
 import {
     Text,
     StyleSheet,
     type ViewStyle,
     type TextStyle,
-    Animated,
 } from 'react-native';
 
-import { type ReanimatedScrollEvent } from 'react-native-reanimated/lib/typescript/reanimated2/hook/commonTypes';
+import Animated , { useDerivedValue, type SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
 interface WheelPickerRowProps {
     idx: number;
@@ -16,128 +15,59 @@ interface WheelPickerRowProps {
     rowStyle?: ViewStyle;
     textStyle?: TextStyle;
     visibleNum: 1 | 2 | 3;
+    scrollY: SharedValue<number>
 }
 
-export type WheelPickerRowRefType = {
-    scrollEvent: (event: ReanimatedScrollEvent) => void;
-    hh: (n: number) => void;
-};
+const WheelPickerRow: React.FC<WheelPickerRowProps> = (props) => {
+    const visibleNum = props.visibleNum + 2
+    const itemHeight = props.itemHeight
+    const deg = 90;
+    const rad = (deg / 180) * 3.14;
+    const _idx = props.idx - props.visibleNum;
 
-const WheelPickerRow = React.forwardRef<
-    WheelPickerRowRefType,
-    WheelPickerRowProps
->((props, ref) => {
-    // const step = 1;
-    // const visibleNum = (props.visibleNum + 1) * step;
-    // const itemHeight = props.itemHeight / step;
-    // const degEach = 90;
-    // const radEach = (degEach / 180) * 3.14;
-    // const _idx = (props.idx - props.visibleNum) * step;
+    const initScrollY = _idx * itemHeight
+    const upperScrollY = initScrollY - visibleNum * itemHeight
+    const lowerScrollY = initScrollY + visibleNum * itemHeight
+    const a = rad / (visibleNum * itemHeight)
+    const b = -rad - upperScrollY * a
 
-    useImperativeHandle(ref, () => {
+    const rotateX = useDerivedValue(() => {
+        if (props.scrollY.value >= upperScrollY && props.scrollY.value <= lowerScrollY) {
+            return `${a * props.scrollY.value + b}rad`
+        }
+        return '0rad'
+    })
+
+    const radEach = rad / visibleNum
+
+
+    const animatedStyles = useAnimatedStyle(() => {
+        let x = Number(rotateX.value.replace('rad', ''))
+        let absX = Math.abs(x)
+
+        let y = 0
+        let opacity = 1
+        if (x >= -rad && x <= rad) {
+            const position = Math.floor(absX / radEach)
+
+            y = (itemHeight / 2) * (1 - Math.sin(Math.PI / 2 - absX)); // prettier-ignore
+            for (let j = 1; j <= position; j++) {
+                absX = absX - radEach
+                y = y + itemHeight * (1 - Math.sin(Math.PI / 2 - absX)); // prettier-ignore
+            }
+
+            opacity = Math.pow(1 / 4, Math.abs(x))
+            if (_idx == 7) {
+                console.log('xx' + Math.abs(x))
+            }
+            y = x > 0 ? y : -y
+        }
+
+
         return {
-            scrollEvent: (event: ReanimatedScrollEvent) => {
-                console.log(event.contentOffset.y);
-            },
-            hh: (n: number) => {
-                console.log(n);
-            },
-        };
-    });
-
-    // props.scrollY.addListener((state: { value: number }) => {
-    //     console.log(`qdfish ${state.value}`);
-    // });
-
-    // const rotateFunc = (idx: number) => {
-    //     const i = (1 / visibleNum) * idx;
-    //     return i;
-    // };
-
-    // const rotateX = props.scrollY.interpolate({
-    //     inputRange: (() => {
-    //         const initScrollY = _idx * itemHeight;
-    //         const range: number[] = [initScrollY];
-    //         for (let i = 1; i <= visibleNum; i++) {
-    //             range.unshift(initScrollY - itemHeight * i);
-    //             range.push(initScrollY + itemHeight * i);
-    //         }
-
-    //         return range;
-    //     })(),
-    //     outputRange: (() => {
-    //         const range: string[] = [`0rad`];
-    //         for (let i = 1; i <= visibleNum; i++) {
-    //             const rad = rotateFunc(i) * radEach;
-    //             range.unshift(`${-rad}rad`);
-    //             range.push(`${rad}rad`);
-    //         }
-    //         return range;
-    //     })(),
-    // });
-
-    // const inputRange = (() => {
-    //     const initScrollY = _idx * itemHeight;
-    //     const range: number[] = [initScrollY];
-    //     const i = visibleNum;
-    //     range.unshift(initScrollY - itemHeight * i);
-    //     range.push(initScrollY + itemHeight * i);
-
-    //     return range;
-    // })();
-
-    // const outputRange = (() => {
-    //     const range: number[] = [0];
-    //     const i = visibleNum;
-    //     let y = (itemHeight / 2) * (1 - Math.sin(Math.PI / 2 - rotateFunc(i) * radEach)); // prettier-ignore
-    //     for (let j = 1; j < i; j++) {
-    //         y = y + itemHeight * (1 - Math.sin(Math.PI / 2 - rotateFunc(j) * radEach)); // prettier-ignore
-    //     }
-    //     range.unshift(-y);
-    //     range.push(y);
-
-    //     return range;
-    // })();
-
-    // const translateY = props.scrollY.interpolate({
-    //     inputRange: inputRange,
-    //     outputRange: outputRange,
-    //     extrapolate: 'clamp',
-    //     easing: (t) => {
-    //         if (_idx == 0) {
-    //             console.log(t);
-    //         }
-
-    //         return t;
-    //     },
-    // });
-
-    // const opacity = props.scrollY.interpolate({
-    //     inputRange: (() => {
-    //         const initScrollY = _idx * itemHeight;
-    //         const range: number[] = [initScrollY];
-    //         for (let i = 1; i <= visibleNum; i++) {
-    //             range.unshift(initScrollY - itemHeight * i);
-    //             range.push(initScrollY + itemHeight * i);
-    //         }
-
-    //         return range;
-    //     })(),
-    //     outputRange: (() => {
-    //         const range = [1];
-    //         for (let x = 1; x <= visibleNum; x++) {
-    //             const y = Math.pow(1 / 2, x);
-    //             range.unshift(y);
-    //             range.push(y);
-    //         }
-    //         return range;
-    //     })(),
-    // });
-
-    // if (_idx == 0) {
-    //     console.log(inputRange);
-    //     console.log(outputRange);
-    // }
+            transform: [{translateY: y}, {rotateX: rotateX.value}], opacity
+        }
+    })
 
     return (
         <Animated.View
@@ -145,12 +75,13 @@ const WheelPickerRow = React.forwardRef<
                 styles.row,
                 props.rowStyle,
                 { height: props.itemHeight, width: 'auto' },
+                animatedStyles
             ]}
         >
             <Text style={[styles.rowTitle, props.textStyle]}>{props.text}</Text>
         </Animated.View>
     );
-});
+};
 
 const styles = StyleSheet.create({
     row: {
@@ -164,4 +95,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default WheelPickerRow;
+export default React.memo(WheelPickerRow);

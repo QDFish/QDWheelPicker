@@ -3,13 +3,12 @@ import {
     FlatList,
     StyleSheet,
     View,
-    TouchableWithoutFeedback,
     type ViewStyle,
     type TextStyle,
 } from 'react-native';
 import { type ReanimatedScrollEvent } from 'react-native-reanimated/lib/typescript/reanimated2/hook/commonTypes';
-import Animated, { useAnimatedScrollHandler } from 'react-native-reanimated';
-import WheelPickerRow, { type WheelPickerRowRefType } from './WheelPickerRow';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import WheelPickerRow from './WheelPickerRow';
 
 interface WheelPickerProps {
     wheelWidth: number;
@@ -25,12 +24,12 @@ interface WheelPickerProps {
 // const AnimatedWheelPickerRow = Animated.createAnimatedComponent(WheelPickerRow)
 
 const WheelPicker: React.FC<WheelPickerProps> = (props) => {
-    const ref = useRef<WheelPickerRowRefType | null>(null);
     const _visibleNum = props.visibleNum ?? 2;
     const listRef = useRef<FlatList<string> | null>(null);
     const momentumBeginRef = useRef<boolean>(false);
     const visibleNum = _visibleNum <= 3 ? _visibleNum : 3;
     const listHeight = (visibleNum * 2 + 1) * props.itemHeight;
+    const scrollY = useSharedValue(0)
 
     let data = props.data.slice();
     let i = visibleNum;
@@ -74,7 +73,7 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
     const scrollHandler = useAnimatedScrollHandler(
         (event: ReanimatedScrollEvent) => {
             'worklet';
-            console.log(event.contentOffset.y);
+            scrollY.value = event.contentOffset.y
         }
     );
 
@@ -135,14 +134,9 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
                 onScroll={scrollHandler}
                 renderItem={({ item, index }) => {
                     return (
-                        <TouchableWithoutFeedback
-                            onPress={() => {
-                                console.log('ddd');
-                                ref.current?.hh(2);
-                            }}
-                        >
+
                             <WheelPickerRow
-                                ref={ref}
+                                scrollY={scrollY}
                                 rowStyle={props.rowStyle}
                                 textStyle={props.textStyle}
                                 itemHeight={props.itemHeight}
@@ -150,7 +144,6 @@ const WheelPicker: React.FC<WheelPickerProps> = (props) => {
                                 idx={index}
                                 visibleNum={visibleNum}
                             />
-                        </TouchableWithoutFeedback>
                     );
                 }}
             />
